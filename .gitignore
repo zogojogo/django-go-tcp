@@ -1,0 +1,4 @@
+crawler/products/*
+crawler/users/*
+crawler/categories/*
+crawler/chromedriver
