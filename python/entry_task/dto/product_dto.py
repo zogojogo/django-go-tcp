@@ -1,6 +1,6 @@
 from collections import OrderedDict
 
-class ProductDTO:
+class ProductDetailsDTO:
     def __init__(self, product, image_urls, categories):
         self.id = product.id
         self.title = product.title
@@ -16,6 +16,31 @@ class ProductDTO:
             ('categories', self.categories),
             ('images', self.images),
         ])
+    
+class ProductDetailsCategoryDTO:
+    def __init__(self, category):
+        self.id = category.id
+        self.name = category.name
+
+    def as_dict(self):
+        return OrderedDict([
+            ('id', self.id),
+            ('name', self.name),
+        ])
+    
+class ProductDTO:
+    def __init__(self, product, image_url):
+        self.id = product.id
+        self.title = product.title
+        self.thumbnail_img = image_url
+
+    def as_dict(self):
+        return OrderedDict([
+            ('id', self.id),
+            ('title', self.title),
+            ('thumbnail_img', self.thumbnail_img)
+        ])
+
     
 class ProductListDTO:
     def __init__(self, products, prev_cursor, next_cursor):
@@ -37,3 +62,4 @@ class ProductSearchDTO:
         self.limit = limit
         self.next_cursor = next_cursor
         self.prev_cursor = prev_cursor
+    # VALIDATE
