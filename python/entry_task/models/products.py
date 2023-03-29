@@ -1,6 +1,5 @@
 from django.db import models
 
-# Create your models here.
 class Category(models.Model):
     class Meta:
         db_table = 'categories'
@@ -8,7 +7,6 @@ class Category(models.Model):
     level = models.IntegerField(default=0)
     parent_category = models.ForeignKey('self', blank=True, null=True)
 
-# Register your models here.
 class Product(models.Model):
     class Meta:
         db_table = 'products'
@@ -26,3 +24,18 @@ class ProductImage(models.Model):
         db_table = 'product_images'
     product = models.ForeignKey(Product, related_name='images', on_delete=models.CASCADE)
     image_url = models.CharField(max_length=120)
+
+class User(models.Model):
+    class Meta:
+        db_table = 'users'
+    username = models.CharField(max_length=120)
+    email = models.CharField(max_length=120)
+    password = models.CharField(max_length=1000)
+
+class ProductComment(models.Model):
+    class Meta:
+        db_table = 'product_comments'
+    product = models.ForeignKey(Product, related_name='product', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name='user', on_delete=models.CASCADE)
+    parent_comment = models.ForeignKey('self', blank=True, null=True)
+    comment_text = models.CharField(max_length=255)
