@@ -1,8 +1,8 @@
 import mysql.connector
 import json
 from tqdm import tqdm
+import os
 
-# Connect to MySQL
 cnx = mysql.connector.connect(
     host="localhost",
     user="root",
@@ -10,45 +10,50 @@ cnx = mysql.connector.connect(
     database="entry_task"
 )
 
-# Get the cursor
 cursor = cnx.cursor()
+unique_count = 3700000
 
-data = []
-with open('data.json') as f:
-    data = json.load(f)
-
-# Insert the data into the database
-for item in tqdm(data["products"]):
-    # Insert the product
-    insert_product_query = """
-        INSERT INTO products (id, title, description)
-        VALUES (%s, %s, %s)
-    """
-    product_values = (item["id"], item["title"], item["description"])
-    cursor.execute(insert_product_query, product_values)
-    cnx.commit()
-
-    # Insert the product images
-    for image_url in item["image_urls"]:
-        insert_image_query = """
-            INSERT INTO product_images (product_id, image_url)
-            VALUES (%s, %s)
+def insert_product_data(data):
+    global unique_count
+    for item in tqdm(data, leave=False):
+        insert_product_query = """
+            INSERT INTO products (id, title, description)
+            VALUES (%s, %s, %s)
         """
-        image_values = (item["id"], image_url)
-        cursor.execute(insert_image_query, image_values)
+        product_values = (unique_count, item["title"], item["description"])
+        cursor.execute(insert_product_query, product_values)
         cnx.commit()
 
-    # Insert the product categories
-    for category_id in item["category_ids"]:
-        insert_category_query = """
-            INSERT INTO product_categories (category_id, product_id)
-            VALUES (%s, %s)
-        """
-        category_values = (category_id, item["id"])
-        cursor.execute(insert_category_query, category_values)
-        cnx.commit()
+        for image_url in item["image_urls"]:
+            insert_image_query = """
+                INSERT INTO product_images (product_id, image_url)
+                VALUES (%s, %s)
+            """
+            image_values = (unique_count, image_url)
+            cursor.execute(insert_image_query, image_values)
+            cnx.commit()
 
-# Close the database connection
-cursor.close()
-cnx.close()
-print("Done!")
+        for category_id in item["category_ids"]:
+            insert_category_query = """
+                INSERT INTO product_categories (category_id, product_id)
+                VALUES (%s, %s)
+            """
+            category_values = (category_id, unique_count)
+            cursor.execute(insert_category_query, category_values)
+            cnx.commit()
+        unique_count += 1
+
+if __name__ == "__main__":
+    files = os.listdir('products')
+
+    for i in tqdm(range(15)):
+        for file in tqdm(files, leave=False):
+            file_path = os.path.join('products', file)
+
+            with open(file_path, "r") as f:
+                data = json.load(f)
+                insert_product_data(data)
+
+    cursor.close()
+    cnx.close()
+    print("Done!")
