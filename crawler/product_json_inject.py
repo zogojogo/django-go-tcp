@@ -11,7 +11,7 @@ cnx = mysql.connector.connect(
 )
 
 cursor = cnx.cursor()
-unique_count = 1100000
+unique_count = 3700000
 
 def insert_product_data(data):
     global unique_count

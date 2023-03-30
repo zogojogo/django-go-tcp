@@ -1,10 +1,24 @@
 from collections import OrderedDict
+from entry_task.errors.product_comment_errors import CursorNegativeError, LimitOutOfRangeError, ParentIDNegativeError
 
 class ProductCommentQueryParamDTO:
     def __init__(self, parent_id=0, limit=10, cursor=0):
         self.parent_id = parent_id
         self.limit = limit
         self.cursor = cursor
+
+    def validate(self):
+        if self.limit < 1 or self.limit > 100:
+            print('An error occured: {}'.format(LimitOutOfRangeError()))
+            raise LimitOutOfRangeError()
+
+        if self.cursor < 0:
+            print('An error occured: {}'.format(CursorNegativeError()))
+            raise CursorNegativeError()
+        
+        if self.parent_id < 0:
+            print('An error occured: {}'.format(ParentIDNegativeError()))
+            raise ParentIDNegativeError()
 
 class ProductCommentDTO:
     def __init__(self, comment, user, has_reply):
@@ -42,3 +56,18 @@ class ProductCommentListDTO:
             ('cursor', self.cursor),
             ('comments', self.comments),
         ])
+    
+class AddProductCommentDTO:
+    def __init__(self, comment_text, product_id, user_id, parent_id=0):
+        self.comment_text = comment_text
+        self.product_id = product_id
+        self.user_id = user_id
+        self.parent_id = parent_id
+
+    def validate(self):
+        if self.comment_text is None or self.comment_text == '':
+            raise ValueError('comment_text is required')
+        if self.product_id is None or self.product_id == '':
+            raise ValueError('product_id is required')
+        if self.user_id is None or self.user_id == '':
+            raise ValueError('user_id is required')

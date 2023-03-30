@@ -1,40 +1,46 @@
 from django.http import HttpResponse
 from django.core.exceptions import ObjectDoesNotExist
+from entry_task.errors.product_errors import ProductNotFoundError, ProductsNotFoundError
+from entry_task.errors.general_errors import InternalServerError
 
 class ProductRepository:
     def __init__(self, product_model):
         self.product_model = product_model
 
     def get_all(self, req):    
+        # if req.cat == 0 and req.q == '':
+        #     return [],0,0
         try:
-            if req.cat == 0 and req.q == '':
-                return [],0,0
-            
-            base_query = self.product_model.objects.select_related('productcategory').filter(title__icontains=req.q)
-            if req.cat != 0:
-                base_query = base_query.filter(productcategory__category_id=req.cat)
-
-            if len(base_query) == 0:
-                return [],0,0
-            
             if req.prev_cursor != 0:
-                base_query = base_query.filter(id__lt=req.prev_cursor).order_by('-id')
+                prods = self.product_model.objects.select_related('productcategory').filter(title__icontains=req.q).filter(id__lt=req.prev_cursor).order_by('-id')[:req.limit+1][::-1]
+                if req.cat != 0:
+                    prods = prods.filter(productcategory__category_id=req.cat)
+                next_cursor = prods[len(prods)-2].id if len(prods) > 0 else 0
+                prev_cursor = prods[0].id if len(prods) > req.limit else 0
+                return prods[:req.limit], prev_cursor, next_cursor
+            
             elif req.next_cursor != 0:
-                base_query = base_query.filter(id__gt=req.next_cursor)
+                prods = self.product_model.objects.select_related('productcategory').filter(title__icontains=req.q).filter(id__gt=req.next_cursor)[:req.limit+1]
+                if req.cat != 0:
+                    prods = prods.filter(productcategory__category_id=req.cat)   
+            
+            else:
+                prods = self.product_model.objects.select_related('productcategory').filter(title__icontains=req.q)[:req.limit+1]
+                if req.cat != 0:
+                    prods = prods.filter(productcategory__category_id=req.cat)
+            
+            if not prods.exists():
+                return [],0,0
 
-            prods = base_query.all()[:req.limit+1]
             next_cursor = prods[len(prods)-2].id if len(prods) > req.limit else 0
-            prev_cursor = 0
-
+            prev_cursor = prods[0].id if len(prods) > 0 else 0
             return prods[:req.limit], prev_cursor, next_cursor
     
         except ObjectDoesNotExist as e:
-            error_msg = 'Products not found: {}'.format(str(e))
-            return HttpResponse(error_msg, status=404)
+            raise ProductsNotFoundError()
 
         except Exception as e:
-            error_msg = "An error occurred: {}".format(str(e))
-            return HttpResponse(error_msg, status=500)
+            raise InternalServerError(str(e))
         
     def get_details(self, id):
         try:
@@ -42,9 +48,7 @@ class ProductRepository:
             return prod
 
         except ObjectDoesNotExist as e:
-            error_msg = 'Product not found: {}'.format(str(e))
-            return HttpResponse(error_msg, status=404)
-
+            raise ProductNotFoundError()
+        
         except Exception as e:
-            error_msg = "An error occurred: {}".format(str(e))
-            return HttpResponse(error_msg, status=500)
+            raise InternalServerError(str(e))
