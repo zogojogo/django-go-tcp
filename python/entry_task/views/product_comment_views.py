@@ -4,8 +4,8 @@ import json
 from entry_task.repository.product_comment_repository import ProductCommentRepository
 from entry_task.usecase.product_comment_usecase import ProductCommentUsecase
 from entry_task.models.app_models import ProductComment
-from entry_task.errors.product_comment_errors import CommentsNotFoundError, ParentIDNegativeError, CursorNegativeError, LimitOutOfRangeError
-from entry_task.dto.product_comment_dto import ProductCommentQueryParamDTO
+from entry_task.errors.product_comment_errors import CommentsNotFoundError, ParentIDNegativeError, CursorNegativeError, LimitOutOfRangeError, CommentTextTooLongError, CommentTextRequiredError, ProductIDRequiredError, UserIDRequiredError
+from entry_task.dto.product_comment_dto import ProductCommentQueryParamDTO, AddProductCommentDTO
 from entry_task.utils.http_statuses import HTTPStatus
 
 class ProductCommentViews:
@@ -15,6 +15,7 @@ class ProductCommentViews:
 
     @csrf_exempt
     def product_comment_list(self, request, id):
+        # BIKIN CUSTOM DECORATOR
         if request.method == 'GET':
             try:
                 cursor = request.GET.get('cursor')
@@ -44,6 +45,37 @@ class ProductCommentViews:
                     "message": str(e)
                 }
                 return HttpResponse(json.dumps(response), content_type="application/json", status=HTTPStatus.BAD_REQUEST)
+            except Exception as e:
+                response = {
+                    "code": HTTPStatus.INTERNAL_SERVER_ERROR,
+                    "message": str(e)
+                }
+                return HttpResponse(json.dumps(response), content_type="application/json", status=HTTPStatus.INTERNAL_SERVER_ERROR)
+        
+        if request.method == 'POST':
+            try:
+                body = json.loads(request.body)
+                dto = AddProductCommentDTO(
+                    comment_text=body['comment_text'],
+                    parent_comment_id=body['parent_comment_id'],
+                    user_id=22383,
+                    product_id=id
+                )
+                dto.validate()
+                res = self.product_comment_usecase.add(dto)
+                response = {
+                    "code": HTTPStatus.CREATED,
+                    "data": res
+                }
+                return HttpResponse(json.dumps(response), content_type="application/json", status=HTTPStatus.CREATED)
+            
+            except (CommentTextTooLongError, CommentTextRequiredError, ProductIDRequiredError, UserIDRequiredError) as e:
+                response = {
+                    "code": HTTPStatus.BAD_REQUEST,
+                    "message": str(e)
+                }
+                return HttpResponse(json.dumps(response), content_type="application/json", status=HTTPStatus.BAD_REQUEST)
+
             except Exception as e:
                 response = {
                     "code": HTTPStatus.INTERNAL_SERVER_ERROR,

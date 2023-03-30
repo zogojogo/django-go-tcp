@@ -24,28 +24,28 @@ class ProductViews:
                 res = self.product_usecase.list(req)
 
                 response = {
-                    "code": 200,
+                    "code": HTTPStatus.OK,
                     "data": res
                 }
-                return HttpResponse(json.dumps(response), content_type="application/json", status=200)
+                return HttpResponse(json.dumps(response), content_type="application/json", status=HTTPStatus.OK)
             except PageCursorsSetAtSameTimeError as e:
                 response = OrderedDict([
                     ("code", HTTPStatus.BAD_REQUEST),
                     ("message", str(e))
                 ])
-                return HttpResponse(json.dumps(response), content_type="application/json", status=400)
+                return HttpResponse(json.dumps(response), content_type="application/json", status=HTTPStatus.BAD_REQUEST)
             except ProductsNotFoundError as e:
                 response = OrderedDict([
                     ("code", HTTPStatus.NOT_FOUND),
                     ("message", str(e))
                 ])
-                return HttpResponse(json.dumps(response), content_type="application/json", status=404)
+                return HttpResponse(json.dumps(response), content_type="application/json", status=HTTPStatus.NOT_FOUND)
             except Exception as e:
                 response = OrderedDict([
                     ("code", HTTPStatus.INTERNAL_SERVER_ERROR),
                     ("message", str(e))
                 ])
-                return HttpResponse(json.dumps(response), content_type="application/json", status=500)
+                return HttpResponse(json.dumps(response), content_type="application/json", status=HTTPStatus.INTERNAL_SERVER_ERROR)
 
     @csrf_exempt
     def product_details(self, request, id):
@@ -56,16 +56,16 @@ class ProductViews:
                     ("code", HTTPStatus.OK),
                     ("data", res)
                 ])
-                return HttpResponse(json.dumps(response), content_type="application/json", status=200)
+                return HttpResponse(json.dumps(response), content_type="application/json", status=HTTPStatus.OK)
             except ProductNotFoundError as e:
                 response = OrderedDict([
                     ("code", HTTPStatus.NOT_FOUND),
                     ("message", str(e))
                 ])
-                return HttpResponse(json.dumps(response), content_type="application/json", status=404)
+                return HttpResponse(json.dumps(response), content_type="application/json", status=HTTPStatus.NOT_FOUND)
             except Exception as e:
                 response = OrderedDict([
                     ("code", HTTPStatus.INTERNAL_SERVER_ERROR),
                     ("message", str(e))
                 ])
-                return HttpResponse(json.dumps(response), content_type="application/json", status=500)
+                return HttpResponse(json.dumps(response), content_type="application/json", status=HTTPStatus.INTERNAL_SERVER_ERROR)

@@ -1,5 +1,5 @@
 from collections import OrderedDict
-from entry_task.errors.product_comment_errors import CursorNegativeError, LimitOutOfRangeError, ParentIDNegativeError
+from entry_task.errors.product_comment_errors import CursorNegativeError, LimitOutOfRangeError, ParentIDNegativeError, CommentTextRequiredError, ProductIDRequiredError, UserIDRequiredError, CommentTextTooLongError
 
 class ProductCommentQueryParamDTO:
     def __init__(self, parent_id=0, limit=10, cursor=0):
@@ -58,16 +58,20 @@ class ProductCommentListDTO:
         ])
     
 class AddProductCommentDTO:
-    def __init__(self, comment_text, product_id, user_id, parent_id=0):
+    def __init__(self, comment_text, product_id, user_id, parent_comment_id):
         self.comment_text = comment_text
         self.product_id = product_id
         self.user_id = user_id
-        self.parent_id = parent_id
+        self.parent_comment_id = parent_comment_id
 
     def validate(self):
         if self.comment_text is None or self.comment_text == '':
-            raise ValueError('comment_text is required')
-        if self.product_id is None or self.product_id == '':
-            raise ValueError('product_id is required')
-        if self.user_id is None or self.user_id == '':
-            raise ValueError('user_id is required')
+            raise CommentTextRequiredError()
+        if self.product_id is None or self.product_id == 0:
+            raise ProductIDRequiredError()
+        if self.user_id is None or self.user_id == 0:
+            raise UserIDRequiredError()
+        if len(self.comment_text) > 255:
+            raise CommentTextTooLongError()
+        if self.parent_comment_id == 0:
+            self.parent_comment_id = None
