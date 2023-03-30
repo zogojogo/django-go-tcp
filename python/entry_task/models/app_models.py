@@ -22,7 +22,7 @@ class ProductCategory(models.Model):
 class ProductImage(models.Model):
     class Meta:
         db_table = 'product_images'
-    product = models.ForeignKey(Product, related_name='images', on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, related_name='images')
     image_url = models.CharField(max_length=120)
 
 class User(models.Model):
@@ -35,7 +35,7 @@ class User(models.Model):
 class ProductComment(models.Model):
     class Meta:
         db_table = 'product_comments'
-    product = models.ForeignKey(Product, related_name='product', on_delete=models.CASCADE)
-    user = models.ForeignKey(User, related_name='user', on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, related_name='product')
+    user = models.ForeignKey(User, related_name='user')
     parent_comment = models.ForeignKey('self', blank=True, null=True)
     comment_text = models.CharField(max_length=255)

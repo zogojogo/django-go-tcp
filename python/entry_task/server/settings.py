@@ -25,12 +25,38 @@ SECRET_KEY = 'ds*%dp_8c)+cw=v2o@g=jw8k4=h0ye-2^f+uxkyc4*bdvawh9-'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-TEMPLATE_DEBUG = True
-
 ALLOWED_HOSTS = []
 
+TEMPLATE_DEBUG = False
 
 # Application definition
+if DEBUG:
+    import logging
+    l = logging.getLogger('django.db.backends')
+    l.setLevel(logging.DEBUG)
+    l.addHandler(logging.StreamHandler())
+
+LOGGING = {
+    'version': 1,
+    'filters': {
+        'require_debug_true': {
+            '()': 'django.utils.log.RequireDebugTrue',
+        }
+    },
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'filters': ['require_debug_true'],
+            'class': 'logging.StreamHandler',
+        }
+    },
+    'loggers': {
+        'django.db.backends': {
+            'level': 'DEBUG',
+            'handlers': ['console'],
+        }
+    }
+}
 
 INSTALLED_APPS = (
     'django.contrib.contenttypes',
@@ -50,7 +76,6 @@ MIDDLEWARE_CLASSES = (
 ROOT_URLCONF = 'entry_task.server.urls'
 
 WSGI_APPLICATION = 'entry_task.server.wsgi.application'
-
 
 # Database
 # https://docs.djangoproject.com/en/1.6/ref/settings/#databases

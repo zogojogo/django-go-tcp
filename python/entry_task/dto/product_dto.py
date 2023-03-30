@@ -1,4 +1,5 @@
 from collections import OrderedDict
+from entry_task.errors.product_errors import PageCursorsSetAtSameTimeError
 
 class ProductDetailsDTO:
     def __init__(self, product, image_urls, categories):
@@ -56,10 +57,14 @@ class ProductListDTO:
         ])
 
 class ProductSearchDTO:
-    def __init__(self, q='', cat=0, limit=10, next_cursor=0, prev_cursor=0):
+    def __init__(self, next_cursor, prev_cursor, q='', cat=0, limit=10):
         self.q = q
         self.cat = cat
         self.limit = limit
         self.next_cursor = next_cursor
         self.prev_cursor = prev_cursor
-    # VALIDATE
+    
+    def validate(self):
+        if self.next_cursor and self.prev_cursor:
+            print('An error occured: {}'.format(PageCursorsSetAtSameTimeError()))
+            raise PageCursorsSetAtSameTimeError()

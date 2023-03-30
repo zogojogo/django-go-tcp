@@ -1,6 +1,5 @@
 from django.conf.urls import patterns, url
-from entry_task.views import product_views
-from entry_task.views import product_comment_views
+from entry_task.views import product_views, product_comment_views
 
 v = product_views.ProductViews()
 vc = product_comment_views.ProductCommentViews()
