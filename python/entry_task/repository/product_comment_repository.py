@@ -1,4 +1,3 @@
-from django.http import HttpResponse
 from django.core.exceptions import ObjectDoesNotExist
 from entry_task.errors.product_comment_errors import CommentsNotFoundError
 from entry_task.errors.general_errors import InternalServerError
@@ -33,6 +32,13 @@ class ProductCommentRepository:
     def check_comment_has_child(self, id):
         try:
             return self.product_comment_model.objects.filter(parent_comment=id).exists()
+        
+        except Exception as e:
+            raise InternalServerError(str(e))
+        
+    def add_new_comment(self, comment):
+        try:
+            return self.product_comment_model.objects.create(**comment)
         
         except Exception as e:
             raise InternalServerError(str(e))

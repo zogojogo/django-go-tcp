@@ -19,11 +19,22 @@ class ProductCommentUsecase:
             except Exception as e:
                 print('An error occured: {}'.format(e))
                 raise e 
-            if product_comment.user:
-                user = ProductCommentUserDTO(product_comment.user).as_dict()
-            else:
+            if not product_comment.user:
                 user = {}
+            user = ProductCommentUserDTO(product_comment.user).as_dict()
             product_comment_dtos.append(ProductCommentDTO(product_comment, user, has_child))
         dto_list = [dto.as_dict() for dto in product_comment_dtos]
         product_comment_list_dto = ProductCommentListDTO(dto_list, cursor).as_dict()
         return product_comment_list_dto
+    
+    def add(self, req_dto):
+        try:
+            product_comment = self.product_comment_repository.add_new_comment(req_dto.__dict__)
+        except Exception as e:
+            print('An error occured: {}'.format(e))
+            raise e
+        if not product_comment.user:
+                user = {}
+        user = ProductCommentUserDTO(product_comment.user).as_dict()
+        product_comment_dto = ProductCommentDTO(product_comment, user, False).as_dict()
+        return product_comment_dto

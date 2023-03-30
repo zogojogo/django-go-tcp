@@ -1,6 +1,7 @@
 crawler/products/*
 crawler/users/*
 crawler/categories/*
+crawler/product_ids/*
 crawler/chromedriver
 
 # Byte-compiled / optimized / DLL files
