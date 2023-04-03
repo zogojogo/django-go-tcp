@@ -6,12 +6,21 @@ type JwtResponse struct {
 }
 
 type LoginRequestDTO struct {
-	Username string `json:"username" binding:"required"`
-	Password string `json:"password" binding:"required"`
+	Username string `json:"username"`
+	Password string `json:"password"`
 }
 
 type RegisterRequestDTO struct {
-	Username string `json:"username" binding:"required,min=4,max=32"`
-	Email    string `json:"email" binding:"required,email"`
-	Password string `json:"password" binding:"required,min=8,max=32"`
+	Username string `json:"username"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
+type AuthResponseDTO struct {
+	Token string `json:"access_token"`
+}
+
+type TCPRequestDTO struct {
+	Action string      `json:"action"`
+	Data   interface{} `json:"data"`
 }
