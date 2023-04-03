@@ -1,4 +1,4 @@
 #!/bin/bash
 
 echo Starting Gunicorn...
-gunicorn entry_task.server.wsgi:application -c ./gunicorn.conf.py
+gunicorn --log-level debug entry_task.server.wsgi:application -c ./gunicorn.conf.py

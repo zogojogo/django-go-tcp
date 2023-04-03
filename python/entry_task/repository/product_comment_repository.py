@@ -1,6 +1,8 @@
 from django.core.exceptions import ObjectDoesNotExist
 from entry_task.errors.product_comment_errors import CommentsNotFoundError
 from entry_task.errors.general_errors import InternalServerError
+from django.db import IntegrityError
+import sys
 
 class ProductCommentRepository:
     def __init__(self, product_comment_model):
@@ -40,5 +42,9 @@ class ProductCommentRepository:
         try:
             return self.product_comment_model.objects.create(**comment)
         
+        except IntegrityError as e:
+            raise InternalServerError("An error occurred while saving the data")
+
         except Exception as e:
-            raise InternalServerError(str(e))
+            raise InternalServerError(str(e))    
+    
