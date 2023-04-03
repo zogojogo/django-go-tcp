@@ -2,7 +2,6 @@ package util
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 )
 
@@ -18,7 +17,6 @@ func ResponseSuccessJSON(data interface{}, encoder *json.Encoder) error {
 		Data: data,
 	}
 	if err := encoder.Encode(response); err != nil {
-		fmt.Println("Error writing response:", err)
 		return err
 	}
 	return nil
@@ -30,7 +28,6 @@ func ResponseErrorJSON(statusCode int, err error, encoder *json.Encoder) error {
 		Message: err.Error(),
 	}
 	if err := encoder.Encode(response); err != nil {
-		fmt.Println("Error writing response:", err)
 		return err
 	}
 	return nil
