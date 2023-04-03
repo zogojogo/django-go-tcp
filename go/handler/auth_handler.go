@@ -2,13 +2,15 @@ package handler
 
 import (
 	"encoding/json"
+	"entry_task/domain"
 	"entry_task/dto"
 	"entry_task/usecase"
 	"entry_task/util"
-	"fmt"
 	"io"
 	"net"
 	"net/http"
+
+	"github.com/rs/zerolog/log"
 )
 
 const (
@@ -34,10 +36,10 @@ func (h *AuthHandler) Handle(conn net.Conn) {
 		var request dto.TCPRequestDTO
 		if err := decoder.Decode(&request); err != nil {
 			if err == io.EOF {
-				fmt.Println("Client closed connection:", err)
+				log.Info().Msg("Connection closed")
 				return
 			}
-			fmt.Println("Error reading message:", err)
+			log.Error().Msg("Error reading request:" + err.Error())
 			return
 		}
 
@@ -47,7 +49,9 @@ func (h *AuthHandler) Handle(conn net.Conn) {
 		case REGISTER_ACTION:
 			h.handleRegister(request, encoder)
 		default:
-			fmt.Println("Invalid action")
+			if err := util.ResponseErrorJSON(http.StatusBadRequest, domain.ErrInvalidAction, encoder); err != nil {
+				log.Error().Msg(domain.ErrInvalidAction.Error())
+			}
 			return
 		}
 	}
@@ -59,7 +63,7 @@ func (h *AuthHandler) handleRegister(data dto.TCPRequestDTO, encoder *json.Encod
 	err := util.UnmarshalJSONData(data.Data, &registerData)
 	if err != nil {
 		if err = util.ResponseErrorJSON(http.StatusBadRequest, err, encoder); err != nil {
-			fmt.Println("Error writing response:", err)
+			log.Error().Msg("Error writing response:" + err.Error())
 			return
 		}
 	}
@@ -67,13 +71,13 @@ func (h *AuthHandler) handleRegister(data dto.TCPRequestDTO, encoder *json.Encod
 	authResp, err := h.authUsecase.Register(registerData)
 	if err != nil {
 		if err = util.ResponseErrorJSON(http.StatusBadRequest, err, encoder); err != nil {
-			fmt.Println("Error writing response:", err)
+			log.Error().Msg("Error writing response:" + err.Error())
 			return
 		}
 	}
 
 	if err = util.ResponseSuccessJSON(authResp, encoder); err != nil {
-		fmt.Println("Error writing response:", err)
+		log.Error().Msg("Error writing response:" + err.Error())
 		return
 	}
 }
@@ -83,7 +87,7 @@ func (h *AuthHandler) handleLogin(data dto.TCPRequestDTO, encoder *json.Encoder)
 	err := util.UnmarshalJSONData(data.Data, &loginData)
 	if err != nil {
 		if err = util.ResponseErrorJSON(http.StatusBadRequest, err, encoder); err != nil {
-			fmt.Println("Error writing response:", err)
+			log.Error().Msg("Error writing response:" + err.Error())
 			return
 		}
 	}
@@ -91,13 +95,13 @@ func (h *AuthHandler) handleLogin(data dto.TCPRequestDTO, encoder *json.Encoder)
 	authResp, err := h.authUsecase.Login(loginData)
 	if err != nil {
 		if err = util.ResponseErrorJSON(http.StatusBadRequest, err, encoder); err != nil {
-			fmt.Println("Error writing response:", err)
+			log.Error().Msg("Error writing response:" + err.Error())
 			return
 		}
 	}
 
 	if err = util.ResponseSuccessJSON(authResp, encoder); err != nil {
-		fmt.Println("Error writing response:", err)
+		log.Error().Msg("Error writing response:" + err.Error())
 		return
 	}
 }

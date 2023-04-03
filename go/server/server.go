@@ -6,10 +6,10 @@ import (
 	"entry_task/repository"
 	"entry_task/usecase"
 	"entry_task/util"
-	"fmt"
 	"net"
 
 	"github.com/joho/godotenv"
+	"github.com/rs/zerolog/log"
 )
 
 func initServer() *handler.AuthHandler {
@@ -34,14 +34,14 @@ func Init() {
 
 	dbErr := db.Connect()
 	if dbErr != nil {
-		fmt.Println("error connecting to DB")
+		log.Error().Msg("Error connecting to database")
 	}
 
 	server, err := net.Listen("tcp", ":8080")
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("Server started on port 8080")
+	log.Error().Msg("Server started on port 8080")
 
 	authHandler := initServer()
 
