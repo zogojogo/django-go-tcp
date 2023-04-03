@@ -6,6 +6,7 @@ import socket
 from entry_task.dto.auth_dto import RegisterUserDTO, LoginDTO
 from entry_task.errors.auth_errors import EmailRequiredError, EmailTooLongError, InvalidEmailError, PasswordRequiredError, PasswordTooLongError, UsernameRequiredError, UsernameTooLongError
 from entry_task.utils.http_statuses import HTTPStatus
+from entry_task.utils.connection_pool import ConnectionPool
 from collections import OrderedDict
 
 class AuthViews:
@@ -14,6 +15,8 @@ class AuthViews:
         self.PORT = int(os.environ.get('TCP_PORT'))
         self.REGISTER_ACTION = "register"
         self.LOGIN_ACTION = "login"
+        self.size = 5
+        self.pool = ConnectionPool(self.HOST, self.PORT, self.size)
 
     @csrf_exempt
     def register(self, request):
@@ -22,10 +25,7 @@ class AuthViews:
                 body = json.loads(request.body)
                 req = RegisterUserDTO(**body)
                 req.validate()
-                s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                # sometimes an error appeared on a working code, connection issue?
-                s.connect((self.HOST, self.PORT))
-
+                s = self.pool.get_connection()
                 payload = {
                     "action": self.REGISTER_ACTION,
                     "data": req.__dict__
@@ -35,7 +35,7 @@ class AuthViews:
                 response = s.recv(1024)
                 data = json.loads(response)
 
-                s.close()
+                self.pool.release_connection(s)
                 return HttpResponse(json.dumps(data, sort_keys=True), content_type="application/json")
             except (UsernameRequiredError, PasswordRequiredError, EmailRequiredError, UsernameTooLongError, PasswordTooLongError, EmailTooLongError, InvalidEmailError) as e:
                 response = OrderedDict([
@@ -49,6 +49,8 @@ class AuthViews:
                     ("message", str(e))
                 ])
                 return HttpResponse(json.dumps(response), content_type="application/json", status=HTTPStatus.INTERNAL_SERVER_ERROR)
+            finally:
+                self.pool.close_all_connections()
         
     @csrf_exempt
     def login(self, request):
@@ -57,8 +59,7 @@ class AuthViews:
                 body = json.loads(request.body)
                 req = LoginDTO(**body)
                 req.validate()
-                s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                s.connect((self.HOST, self.PORT))
+                s = self.pool.get_connection()
 
                 payload = {
                     "action": self.LOGIN_ACTION,
@@ -69,7 +70,7 @@ class AuthViews:
                 response = s.recv(1024)
                 data = json.loads(response)
 
-                s.close()
+                self.pool.release_connection(s)
                 return HttpResponse(json.dumps(data), content_type="application/json")
             except (UsernameRequiredError, PasswordRequiredError) as e:
                 response = OrderedDict([
@@ -83,3 +84,5 @@ class AuthViews:
                     ("message", str(e))
                 ])
                 return HttpResponse(json.dumps(response), content_type="application/json", status=HTTPStatus.INTERNAL_SERVER_ERROR)
+            finally:
+                self.pool.close_all_connections()
