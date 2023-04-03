@@ -19,8 +19,3 @@ type RegisterRequestDTO struct {
 type AuthResponseDTO struct {
 	Token string `json:"access_token"`
 }
-
-type TCPRequestDTO struct {
-	Action string      `json:"action"`
-	Data   interface{} `json:"data"`
-}

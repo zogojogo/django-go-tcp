@@ -7,8 +7,10 @@ import (
 	"entry_task/usecase"
 	"entry_task/util"
 	"net"
+	"os"
 
 	"github.com/joho/godotenv"
+	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )
 
@@ -31,17 +33,18 @@ func Init() {
 	if err != nil {
 		panic(err)
 	}
+	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 
 	dbErr := db.Connect()
 	if dbErr != nil {
-		log.Error().Msg("Error connecting to database")
+		log.Fatal().Msg("Error connecting to database")
 	}
 
 	server, err := net.Listen("tcp", ":8080")
 	if err != nil {
 		panic(err)
 	}
-	log.Error().Msg("Server started on port 8080")
+	log.Info().Msg("Server started on port 8080")
 
 	authHandler := initServer()
 

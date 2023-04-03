@@ -22,6 +22,10 @@ func NewUserRepo(db *gorm.DB) UserRepo {
 	return &userRepoImpl{db}
 }
 
+const (
+	DuplicateErrorConst uint16 = 1062
+)
+
 func (r userRepoImpl) GetByUsername(username string) (*entity.User, error) {
 	var user *entity.User
 	err := r.db.Where("username = ?", username).First(&user).Error
@@ -38,7 +42,7 @@ func (r userRepoImpl) Create(user *entity.User) error {
 	err := r.db.Create(user).Error
 	if err != nil {
 		if mySqlErr, ok := err.(*mysql.MySQLError); ok {
-			if mySqlErr.Number == 1062 {
+			if mySqlErr.Number == DuplicateErrorConst {
 				return domain.ErrUserAlreadyExists
 			}
 		}
