@@ -2,17 +2,12 @@ package util
 
 import (
 	"encoding/json"
+	"entry_task/dto"
 	"net/http"
 )
 
-type TCPResponseDTO struct {
-	Code    int         `json:"code"`
-	Message string      `json:"message,omitempty"`
-	Data    interface{} `json:"data,omitempty"`
-}
-
 func ResponseSuccessJSON(data interface{}, encoder *json.Encoder) error {
-	response := TCPResponseDTO{
+	response := dto.TCPResponseDTO{
 		Code: http.StatusOK,
 		Data: data,
 	}
@@ -23,7 +18,7 @@ func ResponseSuccessJSON(data interface{}, encoder *json.Encoder) error {
 }
 
 func ResponseErrorJSON(statusCode int, err error, encoder *json.Encoder) error {
-	response := TCPResponseDTO{
+	response := dto.TCPResponseDTO{
 		Code:    statusCode,
 		Message: err.Error(),
 	}
