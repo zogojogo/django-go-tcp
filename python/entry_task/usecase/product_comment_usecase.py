@@ -1,6 +1,5 @@
 from entry_task.dto.product_comment_dto import ProductCommentDTO, ProductCommentListDTO, ProductCommentUserDTO
 from entry_task.errors.product_comment_errors import CommentsNotFoundError
-import traceback
 
 class ProductCommentUsecase:
     def __init__(self, product_comment_repository):
@@ -29,7 +28,7 @@ class ProductCommentUsecase:
     
     def add(self, req_dto):
         try:
-            product_comment = self.product_comment_repository.add_new_comment(req_dto.__dict__)
+            product_comment = self.product_comment_repository.add_new_comment(req_dto)
         except Exception as e:
             print('An error occured: {}'.format(e))
             raise e
