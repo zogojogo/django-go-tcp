@@ -29,3 +29,7 @@ class UserIDRequiredError(Exception):
 class CommentTextTooLongError(Exception):
     def __init__(self, message='Comment text is too long'):
         super(CommentTextTooLongError, self).__init__(message)
+
+class ProductConstraintError(Exception):
+    def __init__(self, message='Failed to add comment, product is invalid'):
+        super(ProductConstraintError, self).__init__(message)

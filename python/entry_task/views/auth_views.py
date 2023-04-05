@@ -2,12 +2,11 @@ from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
 import os
-import socket
 from entry_task.dto.auth_dto import RegisterUserDTO, LoginDTO
 from entry_task.errors.auth_errors import EmailRequiredError, EmailTooLongError, InvalidEmailError, PasswordRequiredError, PasswordTooLongError, UsernameRequiredError, UsernameTooLongError
 from entry_task.utils.http_statuses import HTTPStatus
 from entry_task.utils.connection_pool import ConnectionPool
-from collections import OrderedDict
+from entry_task.utils.response import response_error_json
 
 class AuthViews:
     def __init__(self):
@@ -38,17 +37,9 @@ class AuthViews:
                 self.pool.release_connection(s)
                 return HttpResponse(json.dumps(data, sort_keys=True), content_type="application/json")
             except (UsernameRequiredError, PasswordRequiredError, EmailRequiredError, UsernameTooLongError, PasswordTooLongError, EmailTooLongError, InvalidEmailError) as e:
-                response = OrderedDict([
-                    ("code", HTTPStatus.BAD_REQUEST),
-                    ("message", str(e))
-                ])
-                return HttpResponse(json.dumps(response), content_type="application/json", status=HTTPStatus.BAD_REQUEST)
+                return response_error_json(str(e), HTTPStatus.BAD_REQUEST)
             except Exception as e:
-                response = OrderedDict([
-                    ("code", HTTPStatus.INTERNAL_SERVER_ERROR),
-                    ("message", str(e))
-                ])
-                return HttpResponse(json.dumps(response), content_type="application/json", status=HTTPStatus.INTERNAL_SERVER_ERROR)
+                return response_error_json(str(e), HTTPStatus.INTERNAL_SERVER_ERROR)
             finally:
                 self.pool.close_all_connections()
         
@@ -73,16 +64,8 @@ class AuthViews:
                 self.pool.release_connection(s)
                 return HttpResponse(json.dumps(data), content_type="application/json")
             except (UsernameRequiredError, PasswordRequiredError) as e:
-                response = OrderedDict([
-                    ("code", HTTPStatus.BAD_REQUEST),
-                    ("message", str(e))
-                ])
-                return HttpResponse(json.dumps(response), content_type="application/json", status=HTTPStatus.BAD_REQUEST)
+                return response_error_json(str(e), HTTPStatus.BAD_REQUEST)
             except Exception as e:
-                response = OrderedDict([
-                    ("code", HTTPStatus.INTERNAL_SERVER_ERROR),
-                    ("message", str(e))
-                ])
-                return HttpResponse(json.dumps(response), content_type="application/json", status=HTTPStatus.INTERNAL_SERVER_ERROR)
+                return response_error_json(str(e), HTTPStatus.INTERNAL_SERVER_ERROR)
             finally:
                 self.pool.close_all_connections()

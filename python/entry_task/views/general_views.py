@@ -1,7 +1,5 @@
-from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
-from collections import OrderedDict
-import json
+from entry_task.utils.response import response_error_json
 
 class GeneralViews:
     def __init__(self):
@@ -9,8 +7,4 @@ class GeneralViews:
 
     @csrf_exempt
     def endpoint_not_found(self, request):
-        response = OrderedDict([
-            ("code", 404),
-            ("message", "Endpoint not found")
-        ])
-        return HttpResponse(json.dumps(response), content_type="application/json", status=404)
+        return response_error_json("Endpoint not found", 404)
