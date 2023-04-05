@@ -38,7 +38,7 @@ class ProductRepository:
             raise ProductsNotFoundError()
 
         except Exception as e:
-            raise InternalServerError(str(e))
+            raise InternalServerError()
         
     def get_details(self, id):
         try:
@@ -49,4 +49,4 @@ class ProductRepository:
             raise ProductNotFoundError()
         
         except Exception as e:
-            raise InternalServerError(str(e))
+            raise InternalServerError()

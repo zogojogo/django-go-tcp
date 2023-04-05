@@ -1,9 +1,8 @@
 import jwt
 import os
-from django.http import HttpResponse
-from collections import OrderedDict
 from entry_task.utils.http_statuses import HTTPStatus
 from entry_task.utils.response import response_error_json
+from jwt.exceptions import DecodeError, ExpiredSignatureError
 
 class JWTAuthenticationMiddleware(object):
     def __init__(self):
@@ -24,8 +23,11 @@ class JWTAuthenticationMiddleware(object):
                     if jwt_decoded['user']:
                         request.user = jwt_decoded['user']
 
-                except jwt.exceptions.DecodeError as e:
+                except (DecodeError, ExpiredSignatureError):
                     return response_error_json("Unauthorize", HTTPStatus.UNAUTHORIZED)
+                
+                except Exception:
+                    return response_error_json("Internal Server Error", HTTPStatus.INTERNAL_SERVER_ERROR)
             
             else:
                     return response_error_json("Unauthorize", HTTPStatus.UNAUTHORIZED)

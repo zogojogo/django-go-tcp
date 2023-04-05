@@ -28,18 +28,18 @@ class ProductCommentRepository:
             raise CommentsNotFoundError()
         
         except Exception as e:
-            raise InternalServerError(str(e))
+            raise InternalServerError()
         
     def check_comment_has_child(self, id):
         try:
             return self.product_comment_model.objects.filter(parent_comment=id).exists()
         
         except Exception as e:
-            raise InternalServerError(str(e))
+            raise InternalServerError()
         
     def add_new_comment(self, comment):
         try:
-            return self.product_comment_model.objects.create(**comment)
+            return self.product_comment_model.objects.create(**comment.__dict__)
         
         except IntegrityError as e:
             code = e[0]
@@ -49,5 +49,5 @@ class ProductCommentRepository:
             raise InternalServerError("An error occured while adding new comment")
 
         except Exception as e:
-            raise InternalServerError(str(e))    
+            raise InternalServerError()    
     
