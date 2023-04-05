@@ -46,7 +46,7 @@ func (r userRepoImpl) Create(user *entity.User) error {
 				return domain.ErrUserAlreadyExists
 			}
 		}
-		return domain.ErrInternalServerError
+		return domain.ErrFailedRegister
 	}
 	return nil
 }
