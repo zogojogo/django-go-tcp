@@ -5,6 +5,9 @@ crawler/product_ids/*
 crawler/chromedriver
 
 go/tmp/*
+go/mocks/*
+
+nginx/tmp/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
