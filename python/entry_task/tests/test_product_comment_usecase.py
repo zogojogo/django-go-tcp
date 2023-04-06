@@ -44,6 +44,22 @@ class TestProductCommentListUsecase(unittest.TestCase):
         with self.assertRaises(ParentIDNegativeError):
             usecase.list(product_id, req)
 
+    def test_list_error_check_child(self):
+        product_id = 1
+        req = {"cursor": 0, "limit": 10, "parent_comment_id": 1}
+        product_comment = Mock(
+            has_child=Mock(),
+            user=None
+        )
+        product_comment_repository = Mock()
+
+        product_comment_repository.get_by_product_id.return_value = ([product_comment], 0)
+        product_comment_repository.check_comment_has_child.side_effect = InternalServerError()
+        usecase = ProductCommentUsecase(product_comment_repository)
+
+        with self.assertRaises(InternalServerError):
+            usecase.list(product_id, req)
+
     def test_list_success(self):
         product_id = 1
         req = {"cursor": 0, "limit": 10}
@@ -54,6 +70,52 @@ class TestProductCommentListUsecase(unittest.TestCase):
 
         expected_result = ProductCommentListDTO([], 0).as_dict()
         self.assertEqual(res, expected_result)
+
+    def test_list_success_child(self):
+        product_id = 1
+        req = {"cursor": 0, "limit": 10, "parent_comment_id": 1}
+        product_comment = Mock(
+            has_child=Mock(),
+            user=None
+        )
+        product_comment_repository = Mock()
+        expected_result = ProductCommentListDTO([
+            ProductCommentDTO(
+                product_comment, {}, True
+            ).as_dict()
+        ], 0).as_dict()
+
+        product_comment_repository.get_by_product_id.return_value = ([product_comment], 0)
+        product_comment_repository.check_comment_has_child.return_value = True
+        usecase = ProductCommentUsecase(product_comment_repository)
+        res = usecase.list(product_id, req)
+
+        self.assertEqual(res, expected_result)
+
+    def test_list_success_user(self):
+        product_id = 1
+        req = {"cursor": 0, "limit": 10}
+        product_comment = Mock(
+            has_child=Mock(),
+            user=Mock(
+                id=1,
+                username="test",
+            )
+        )
+        product_comment_repository = Mock()
+        expected_result = ProductCommentListDTO([
+            ProductCommentDTO(product_comment, ProductCommentUserDTO(
+                product_comment.user
+            ).as_dict(), False).as_dict()
+        ], 0).as_dict()
+
+        product_comment_repository.get_by_product_id.return_value = ([product_comment], 0)
+        product_comment_repository.check_comment_has_child.return_value = False
+        usecase = ProductCommentUsecase(product_comment_repository)
+        res = usecase.list(product_id, req)
+
+        self.assertEqual(res, expected_result)
+
 
 class TestProductCommentAddUsecase(unittest.TestCase):
     def test_add_error_comment_text_required(self):
@@ -110,7 +172,6 @@ class TestProductCommentAddUsecase(unittest.TestCase):
         product_comment_repository.add_new_comment.return_value = comment
         usecase = ProductCommentUsecase(product_comment_repository)
         res = usecase.add(req)
-        print(res)
 
         expected_user = ProductCommentUserDTO(user).as_dict()
         expected_result = ProductCommentDTO(comment, expected_user, False).as_dict()

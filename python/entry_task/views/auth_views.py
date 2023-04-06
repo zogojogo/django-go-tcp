@@ -14,7 +14,7 @@ class AuthViews:
         self.PORT = int(os.environ.get('TCP_PORT'))
         self.REGISTER_ACTION = "register"
         self.LOGIN_ACTION = "login"
-        self.size = 5
+        self.size = 4000
         self.pool = ConnectionPool(self.HOST, self.PORT, self.size)
 
     @csrf_exempt
@@ -40,8 +40,6 @@ class AuthViews:
                 return response_error_json(str(e), HTTPStatus.BAD_REQUEST)
             except Exception as e:
                 return response_error_json(str(e), HTTPStatus.INTERNAL_SERVER_ERROR)
-            finally:
-                self.pool.close_all_connections()
         
     @csrf_exempt
     def login(self, request):
@@ -58,6 +56,7 @@ class AuthViews:
                 }
 
                 s.sendall(json.dumps(payload))
+
                 response = s.recv(1024)
                 data = json.loads(response)
 
@@ -67,5 +66,3 @@ class AuthViews:
                 return response_error_json(str(e), HTTPStatus.BAD_REQUEST)
             except Exception as e:
                 return response_error_json(str(e), HTTPStatus.INTERNAL_SERVER_ERROR)
-            finally:
-                self.pool.close_all_connections()
