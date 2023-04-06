@@ -1,24 +1,28 @@
 import socket
+from Queue import Queue
 
 class ConnectionPool(object):
     def __init__(self, host, port, size):
         self.host = host
         self.port = port
         self.size = size
-        self.connections = []
+        self.connections = Queue(maxsize=size)
 
     def get_connection(self):
-        if len(self.connections) < self.size:
+        try:
+            conn = self.connections.get_nowait()
+        except:
             conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             conn.connect((self.host, self.port))
-            self.connections.append(conn)
-        else:
-            conn = self.connections.pop()
         return conn
 
     def release_connection(self, conn):
-        self.connections.append(conn)
+        try:
+            self.connections.put_nowait(conn)
+        except Queue.Full:
+            conn.close()
 
     def close_all_connections(self):
-        for conn in self.connections:
+        while not self.connections.empty():
+            conn = self.connections.get()
             conn.close()
