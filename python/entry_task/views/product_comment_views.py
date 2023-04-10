@@ -4,6 +4,7 @@ from entry_task.repository.product_comment_repository import ProductCommentRepos
 from entry_task.usecase.product_comment_usecase import ProductCommentUsecase
 from entry_task.models.app_models import ProductComment
 from entry_task.errors.product_comment_errors import CommentsNotFoundError, ParentIDNegativeError, CursorNegativeError, LimitOutOfRangeError, CommentTextTooLongError, CommentTextRequiredError, ProductIDRequiredError, UserIDRequiredError, ProductConstraintError
+from entry_task.errors.general_errors import InternalServerError
 from entry_task.dto.product_comment_dto import ProductCommentQueryParamDTO, AddProductCommentDTO
 from entry_task.utils.http_statuses import HTTPStatus
 from entry_task.utils.response import response_error_json, response_success_json
@@ -33,7 +34,7 @@ class ProductCommentViews:
             except (CursorNegativeError, ParentIDNegativeError, LimitOutOfRangeError) as e:
                 return response_error_json(str(e), HTTPStatus.BAD_REQUEST)
             except Exception as e:
-                return response_error_json(str(e), HTTPStatus.INTERNAL_SERVER_ERROR)
+                return response_error_json("Something went wrong", HTTPStatus.INTERNAL_SERVER_ERROR)
         
         if request.method == 'POST':
             try:
@@ -53,4 +54,4 @@ class ProductCommentViews:
                 return response_error_json(str(e), HTTPStatus.BAD_REQUEST)
 
             except Exception as e:
-                return response_error_json(str(e), HTTPStatus.INTERNAL_SERVER_ERROR)
+                return response_error_json("Something went wrong", HTTPStatus.INTERNAL_SERVER_ERROR)

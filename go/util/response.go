@@ -3,12 +3,11 @@ package util
 import (
 	"encoding/json"
 	"entry_task/dto"
-	"net/http"
 )
 
-func ResponseSuccessJSON(data interface{}, encoder *json.Encoder) error {
+func ResponseSuccessJSON(statusCode int, data interface{}, encoder *json.Encoder) error {
 	response := dto.TCPResponseDTO{
-		Code: http.StatusOK,
+		Code: statusCode,
 		Data: data,
 	}
 	if err := encoder.Encode(response); err != nil {
