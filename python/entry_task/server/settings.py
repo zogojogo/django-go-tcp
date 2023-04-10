@@ -23,9 +23,9 @@ load_dotenv()
 SECRET_KEY = 'ds*%dp_8c)+cw=v2o@g=jw8k4=h0ye-2^f+uxkyc4*bdvawh9-'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 TEMPLATE_DEBUG = False
 

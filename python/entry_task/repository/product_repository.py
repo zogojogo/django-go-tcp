@@ -1,4 +1,3 @@
-from django.http import HttpResponse
 from django.core.exceptions import ObjectDoesNotExist
 from entry_task.errors.product_errors import ProductNotFoundError, ProductsNotFoundError
 from entry_task.errors.general_errors import InternalServerError
@@ -11,7 +10,7 @@ class ProductRepository:
     def get_all(self, req):    
         try:
             if req.prev_cursor != 0:
-                prods = self.product_model.objects.select_related('productcategory').filter(
+                prods = self.product_model.objects.prefetch_related('images').filter(
                     Q(title__icontains=req.q) if req.q != '' else Q(),
                     Q(id__lt=req.prev_cursor),
                     Q(productcategory__category_id=req.cat) if req.cat != 0 else Q()
@@ -21,7 +20,7 @@ class ProductRepository:
                 return prods[1:req.limit+1] if len(prods) > req.limit else prods[:req.limit], prev_cursor, next_cursor
             
             else:
-                prods = self.product_model.objects.select_related('productcategory').filter(
+                prods = self.product_model.objects.prefetch_related('images').filter(
                     Q(title__icontains=req.q) if req.q != '' else Q(),
                     Q(id__gt=req.next_cursor),
                     Q(productcategory__category_id=req.cat) if req.cat != 0 else Q()
@@ -48,5 +47,11 @@ class ProductRepository:
         except ObjectDoesNotExist as e:
             raise ProductNotFoundError()
         
+        except Exception as e:
+            raise InternalServerError()
+        
+    def get_product_images(self, products):
+        try:
+            prod_images = self.product_image_model.objects.filter(product__in=products)
         except Exception as e:
             raise InternalServerError()
