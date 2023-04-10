@@ -51,7 +51,8 @@ func Init() {
 	for {
 		conn, err := server.Accept()
 		if err != nil {
-			panic(err)
+			log.Fatal().Msg("Failed to accept connection")
+			panic("Failed to accept connection")
 		}
 		go authHandler.Handle(conn)
 	}

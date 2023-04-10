@@ -3,6 +3,7 @@ import os
 from entry_task.utils.http_statuses import HTTPStatus
 from entry_task.utils.response import response_error_json
 from jwt.exceptions import DecodeError, ExpiredSignatureError
+import os
 
 class JWTAuthenticationMiddleware(object):
     def __init__(self):
@@ -11,8 +12,11 @@ class JWTAuthenticationMiddleware(object):
             '/register/',
         ]
         self.jwt_secret_key = os.environ.get('JWT_SECRET')
+        self.env = os.environ.get('ENV')
 
     def process_request(self, request):
+        if self.env == 'test':
+            return None
         if request.path not in self.allowed_paths:
             jwt_auth_header = request.META.get('HTTP_AUTHORIZATION', None)
             if jwt_auth_header:

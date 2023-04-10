@@ -7,10 +7,11 @@ vg = general_views.GeneralViews()
 va = auth_views.AuthViews()
 urlpatterns = patterns('',
     url(r'^products/$', v.product_list),
-    url(r'^products/(?P<id>\d+)/$', v.product_details),
+    url(r'^products/(?P<id>\d+)$', v.product_details),
     url(r'^products/(?P<id>\d+)/comments/?$', vc.product_comment_list),
     url(r'^register/$', va.register),
     url(r'^login/$', va.login),
+    url(r'^ping/$', vg.ping),
     url(r'^.*$', vg.endpoint_not_found),
 )
 

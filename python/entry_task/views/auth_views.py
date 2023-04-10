@@ -4,6 +4,7 @@ import json
 import os
 from entry_task.dto.auth_dto import RegisterUserDTO, LoginDTO
 from entry_task.errors.auth_errors import EmailRequiredError, EmailTooLongError, InvalidEmailError, PasswordRequiredError, PasswordTooLongError, UsernameRequiredError, UsernameTooLongError
+from entry_task.errors.general_errors import InternalServerError
 from entry_task.utils.http_statuses import HTTPStatus
 from entry_task.utils.connection_pool import ConnectionPool
 from entry_task.utils.response import response_error_json
@@ -39,7 +40,7 @@ class AuthViews:
             except (UsernameRequiredError, PasswordRequiredError, EmailRequiredError, UsernameTooLongError, PasswordTooLongError, EmailTooLongError, InvalidEmailError) as e:
                 return response_error_json(str(e), HTTPStatus.BAD_REQUEST)
             except Exception as e:
-                return response_error_json(str(e), HTTPStatus.INTERNAL_SERVER_ERROR)
+                return response_error_json("Something went wrong", HTTPStatus.INTERNAL_SERVER_ERROR)
         
     @csrf_exempt
     def login(self, request):
@@ -61,8 +62,8 @@ class AuthViews:
                 data = json.loads(response)
 
                 self.pool.release_connection(s)
-                return HttpResponse(json.dumps(data), content_type="application/json")
+                return HttpResponse(json.dumps(data, sort_keys=True), content_type="application/json")
             except (UsernameRequiredError, PasswordRequiredError) as e:
                 return response_error_json(str(e), HTTPStatus.BAD_REQUEST)
             except Exception as e:
-                return response_error_json(str(e), HTTPStatus.INTERNAL_SERVER_ERROR)
+                return response_error_json("Something went wrong", HTTPStatus.INTERNAL_SERVER_ERROR)

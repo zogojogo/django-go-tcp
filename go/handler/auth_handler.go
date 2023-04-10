@@ -75,7 +75,7 @@ func (h *AuthHandler) handleRegister(data dto.TCPRequestDTO, encoder *json.Encod
 		}
 	}
 
-	if err = util.ResponseSuccessJSON(authResp, encoder); err != nil {
+	if err = util.ResponseSuccessJSON(http.StatusCreated, authResp, encoder); err != nil {
 		log.Fatal().Msg("Error writing response:" + err.Error())
 		return
 	}
@@ -99,7 +99,7 @@ func (h *AuthHandler) handleLogin(data dto.TCPRequestDTO, encoder *json.Encoder)
 		}
 	}
 
-	if err = util.ResponseSuccessJSON(authResp, encoder); err != nil {
+	if err = util.ResponseSuccessJSON(http.StatusOK, authResp, encoder); err != nil {
 		log.Fatal().Msg("Error writing response:" + err.Error())
 		return
 	}

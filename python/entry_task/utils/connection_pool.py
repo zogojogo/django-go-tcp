@@ -1,5 +1,5 @@
 import socket
-from Queue import Queue
+from Queue import Queue, Empty, Full
 
 class ConnectionPool(object):
     def __init__(self, host, port, size):
@@ -11,7 +11,7 @@ class ConnectionPool(object):
     def get_connection(self):
         try:
             conn = self.connections.get_nowait()
-        except:
+        except Empty:
             conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             conn.connect((self.host, self.port))
         return conn
@@ -19,7 +19,7 @@ class ConnectionPool(object):
     def release_connection(self, conn):
         try:
             self.connections.put_nowait(conn)
-        except Queue.Full:
+        except Full:
             conn.close()
 
     def close_all_connections(self):
