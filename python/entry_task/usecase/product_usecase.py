@@ -15,8 +15,8 @@ class ProductUsecase:
         product_dtos = []
         for product in products:
             thumbnail_img = ''
-            if product.images.all():
-                thumbnail_img = product.images.all()[0].image_url
+            if product.images.all()[0]:
+                thumbnail_img = product.images.all()[0].image_url       
             product_dtos.append(ProductDTO(product, thumbnail_img))
         dto_list = [dto.as_dict() for dto in product_dtos]
         product_list_dto = ProductListDTO(dto_list, prev_cursor, next_cursor).as_dict()

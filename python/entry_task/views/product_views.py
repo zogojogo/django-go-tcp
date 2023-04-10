@@ -8,6 +8,7 @@ from entry_task.errors.product_errors import ProductNotFoundError, ProductsNotFo
 from entry_task.errors.general_errors import InternalServerError
 from entry_task.utils.http_statuses import HTTPStatus
 from entry_task.utils.response import response_error_json, response_success_json
+import time
 
 class ProductViews:
     def __init__(self):
@@ -16,7 +17,7 @@ class ProductViews:
 
     @csrf_exempt
     def product_list(self, request):
-        if request.method == 'POST':
+        if request.method == 'GET':
             try:
                 body = json.loads(request.body)
                 req = ProductSearchDTO(**body)
@@ -29,7 +30,7 @@ class ProductViews:
             except ProductsNotFoundError as e:
                 return response_error_json(str(e), HTTPStatus.NOT_FOUND)
             except Exception as e:
-                return response_error_json("Something went wrong", HTTPStatus.INTERNAL_SERVER_ERROR)
+                return response_error_json(str(e), HTTPStatus.INTERNAL_SERVER_ERROR)
 
     @csrf_exempt
     def product_details(self, request, id):
