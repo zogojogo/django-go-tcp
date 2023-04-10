@@ -34,8 +34,17 @@ func Connect() (err error) {
 		c.DBName,
 	)
 	db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{
-		Logger: getLogger(),
+		// Logger: getLogger(),
 	})
+	if err != nil {
+		return
+	}
+	// set max idle connection
+	sqlDB, err := db.DB()
+	if err != nil {
+		return
+	}
+	sqlDB.SetMaxIdleConns(10)
 	return
 }
 

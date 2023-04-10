@@ -5,7 +5,7 @@ function payload()
         limit = 10,
         prev_cursor = 0,
         next_cursor = 0,
-        q = "cincin",
+        q = "",
         cat = 0,
     }
     return json.encode(payload)
@@ -16,12 +16,12 @@ function response(status, headers, body)
        print(string.format("Error: status=%d, body=%s", status, body))
     end
 
-    if status == 200 then
-        print(string.format("Success: status=%d, body=%s", status, body))
-      end
+    -- if status == 200 then
+    --     print(string.format("Success: status=%d, body=%s", status, body))
+    --   end
 end
 
 local body = payload()
-wrk.method = "POST"
+wrk.method = "GET"
 wrk.headers["Content-Type"] = "application/json"
 wrk.body = body
