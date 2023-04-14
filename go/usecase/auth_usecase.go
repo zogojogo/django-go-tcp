@@ -30,10 +30,10 @@ func NewAuthUsecase(config *AuthUsecaseConfig) AuthUsecase {
 func (u authUsecaseImpl) Login(data dto.LoginRequestDTO) (*dto.AuthResponseDTO, error) {
 	user, err := u.userRepo.GetByUsername(data.Username)
 	if err != nil {
-		return nil, err
+		return nil, domain.ErrInvalidCredentials
 	}
 	if !u.authUtil.ComparePassword(user.Password, data.Password) {
-		return nil, domain.ErrInvalidPassword
+		return nil, domain.ErrInvalidCredentials
 	}
 	token, err := u.authUtil.GenerateAccessToken(user)
 	if err != nil {

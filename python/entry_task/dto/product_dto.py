@@ -1,5 +1,5 @@
 from collections import OrderedDict
-from entry_task.errors.product_errors import PageCursorsSetAtSameTimeError
+from entry_task.errors.product_errors import PageCursorsSetAtSameTimeError, CursorNegativeError, LimitOutOfRangeError
 
 class ProductDetailsDTO:
     def __init__(self, product, image_urls, categories):
@@ -68,3 +68,12 @@ class ProductSearchDTO:
         if self.next_cursor and self.prev_cursor:
             print('An error occured: {}'.format(PageCursorsSetAtSameTimeError()))
             raise PageCursorsSetAtSameTimeError()
+        
+        if self.limit < 1 or self.limit > 100:
+            print('An error occured: {}'.format(LimitOutOfRangeError()))
+            raise LimitOutOfRangeError()
+
+        if self.next_cursor or self.prev_cursor < 0:
+            print('An error occured: {}'.format(CursorNegativeError()))
+            raise CursorNegativeError()
+

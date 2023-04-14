@@ -15,15 +15,18 @@ class AuthViews:
         self.PORT = int(os.environ.get('TCP_PORT'))
         self.REGISTER_ACTION = "register"
         self.LOGIN_ACTION = "login"
-        self.size = 4000
+        self.size = 35
         self.pool = ConnectionPool(self.HOST, self.PORT, self.size)
 
     @csrf_exempt
     def register(self, request):
         if request.method == 'POST':
-            try:   
+            try:
                 body = json.loads(request.body)
                 req = RegisterUserDTO(**body)
+            except:
+                return response_error_json("Failed to bind json, invalid request body", HTTPStatus.BAD_REQUEST)
+            try:   
                 req.validate()
                 s = self.pool.get_connection()
                 payload = {
@@ -48,6 +51,9 @@ class AuthViews:
             try:
                 body = json.loads(request.body)
                 req = LoginDTO(**body)
+            except:
+                return response_error_json("Failed to bind json, invalid request body", HTTPStatus.BAD_REQUEST)
+            try:
                 req.validate()
                 s = self.pool.get_connection()
 
@@ -66,4 +72,4 @@ class AuthViews:
             except (UsernameRequiredError, PasswordRequiredError) as e:
                 return response_error_json(str(e), HTTPStatus.BAD_REQUEST)
             except Exception as e:
-                return response_error_json("Something went wrong", HTTPStatus.INTERNAL_SERVER_ERROR)
+                return response_error_json(str(e), HTTPStatus.INTERNAL_SERVER_ERROR)

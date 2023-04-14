@@ -52,7 +52,7 @@ func TestLogin(t *testing.T) {
 		authMocks.On("ComparePassword", expectedUser.Password, givenLoginRequest.Password).Return(false)
 		res, err := authUC.Login(givenLoginRequest)
 
-		assert.EqualError(t, err, domain.ErrInvalidPassword.Error())
+		assert.EqualError(t, err, domain.ErrInvalidCredentials.Error())
 		assert.Nil(t, res)
 	})
 

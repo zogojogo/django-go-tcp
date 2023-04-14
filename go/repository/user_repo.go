@@ -28,7 +28,10 @@ const (
 
 func (r userRepoImpl) GetByUsername(username string) (*entity.User, error) {
 	var user *entity.User
-	err := r.db.Where("username = ?", username).First(&user).Error
+	err := r.db.
+		Select("id, username, password").
+		Where("username = ?", username).
+		First(&user).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, domain.ErrUserNotFound

@@ -12,6 +12,9 @@ https://docs.djangoproject.com/en/1.6/ref/settings/
 import os
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
+from gevent import monkey
+monkey.patch_all()
+
 # Environment variables
 from dotenv import load_dotenv
 load_dotenv()

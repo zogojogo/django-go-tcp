@@ -65,6 +65,7 @@ func (h *AuthHandler) handleRegister(data dto.TCPRequestDTO, encoder *json.Encod
 			log.Fatal().Msg("Error writing response:" + err.Error())
 			return
 		}
+		return
 	}
 
 	authResp, err := h.authUsecase.Register(registerData)
@@ -73,6 +74,7 @@ func (h *AuthHandler) handleRegister(data dto.TCPRequestDTO, encoder *json.Encod
 			log.Fatal().Msg("Error writing response:" + err.Error())
 			return
 		}
+		return
 	}
 
 	if err = util.ResponseSuccessJSON(http.StatusCreated, authResp, encoder); err != nil {
@@ -89,18 +91,20 @@ func (h *AuthHandler) handleLogin(data dto.TCPRequestDTO, encoder *json.Encoder)
 			log.Fatal().Msg("Error writing response:" + err.Error())
 			return
 		}
+		return
 	}
 
 	authResp, err := h.authUsecase.Login(loginData)
 	if err != nil {
-		if err = util.ResponseErrorJSON(http.StatusBadRequest, err, encoder); err != nil {
-			log.Fatal().Msg("Error writing response:" + err.Error())
+		if err_json := util.ResponseErrorJSON(http.StatusBadRequest, err, encoder); err_json != nil {
+			log.Fatal().Msg("Error writing response:" + err_json.Error())
 			return
 		}
+		return
 	}
 
-	if err = util.ResponseSuccessJSON(http.StatusOK, authResp, encoder); err != nil {
-		log.Fatal().Msg("Error writing response:" + err.Error())
+	if err_json := util.ResponseSuccessJSON(http.StatusOK, authResp, encoder); err_json != nil {
+		log.Fatal().Msg("Error writing response:" + err_json.Error())
 		return
 	}
 }

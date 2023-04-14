@@ -46,6 +46,9 @@ class ProductCommentViews:
                     user_id=user.get('user_id'),
                     product_id=id
                 )
+            except:
+                return response_error_json("Failed to bind json, invalid request body", HTTPStatus.BAD_REQUEST)
+            try:
                 dto.validate()
                 res = self.product_comment_usecase.add(dto)
                 return response_success_json(res, HTTPStatus.CREATED)

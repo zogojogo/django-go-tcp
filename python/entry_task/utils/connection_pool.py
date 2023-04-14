@@ -1,25 +1,30 @@
+import gevent
+from gevent.queue import Queue
 import socket
-from Queue import Queue, Empty, Full
 
-class ConnectionPool(object):
-    def __init__(self, host, port, size):
+class ConnectionPool:
+    def __init__(self, host, port, size=None):
         self.host = host
         self.port = port
         self.size = size
-        self.connections = Queue(maxsize=size)
+        self.connections = Queue(maxsize=size) if size else None
 
     def get_connection(self):
         try:
+            # connection pool
             conn = self.connections.get_nowait()
-        except Empty:
-            conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            conn.connect((self.host, self.port))
+            print("get")
+            print("queue lenght: {}".format(self.connections.qsize()))
+        except gevent.queue.Empty:
+            conn = socket.create_connection((self.host, self.port))
         return conn
 
     def release_connection(self, conn):
         try:
             self.connections.put_nowait(conn)
-        except Full:
+            print("release")
+            print("queue lenght: {}".format(self.connections.qsize()))
+        except gevent.queue.Full:
             conn.close()
 
     def close_all_connections(self):
