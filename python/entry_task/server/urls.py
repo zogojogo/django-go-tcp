@@ -11,6 +11,7 @@ urlpatterns = patterns('',
     url(r'^products/(?P<id>\d+)/comments/?$', vc.product_comment_list),
     url(r'^register/$', va.register),
     url(r'^login/$', va.login),
+    url(r'^test/$', va.test),
     url(r'^ping/$', vg.ping),
     url(r'^.*$', vg.endpoint_not_found),
 )

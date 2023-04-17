@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package go;
+
+import "google/protobuf/any.proto";
+
+option go_package = "proto/";
+
+message LoginRequest {
+  string username = 1;
+  string password = 2;
+}
+
+message RegisterRequest {
+  string username = 1;
+  string email = 2;
+  string password = 3;
+}
+
+message AuthResponse {
+  string access_token = 1;
+}
+
+message TCPRequest {
+  string action = 1;
+  google.protobuf.Any data = 2;
+}
+
+message TCPResponse {
+  int32 code = 1;
+  string message = 2;
+  google.protobuf.Any data = 3;
+}
