@@ -1,7 +1,7 @@
-# Entry Task BE MPO
+# EDJANGO GO TCP SERVER
 
 ## Introduction
-This project is a part of the entry task for the Backend MPO role at Sealabs Digitalent. The task is to create a simple REST API to manage products and categories. Then deploy the API using gunicorn and nginx. For the database, I use MySQL. The API is written in Python using Django framework. I also create a simple TCP server using Golang to handle authentication features.
+The task is to create a simple REST API to manage products and categories. Then deploy the API using gunicorn and nginx. For the database, I use MySQL. The API is written in Python using Django framework. I also create a simple TCP server using Golang to handle authentication features.
 
 ## API Documentation
 The API documentation can be found in the following link: https://documenter.getpostman.com/view/24100576/2s93RNzaSr
